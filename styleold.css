@@ -1,0 +1,500 @@
+
+:root{
+  --bg:#0f1016; --card:#151826; --text:#eef2ff; --muted:#b8c0ff;
+  --pink:#ff7ac3; --pink-2:#ffa7d7; --accent:#9ee6ff;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; font-family:Kanit, system-ui, -apple-system, sans-serif;
+  color:var(--text); background:radial-gradient(1200px 1200px at 50% -200px,#1b1f33 10%,#0f1016 60%) fixed;
+  overflow-x:hidden;
+}
+
+/* พลุเต็มจอ */
+#fireworks{
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+}
+
+/* ควบคุมเพลง ทุกหน้า */
+.audio-ctrl{
+  position:fixed; right:12px; bottom:12px; z-index:20;
+  display:flex; gap:8px; background:rgba(0,0,0,.35);
+  border:1px solid rgba(255,255,255,.15); padding:6px 8px; border-radius:999px;
+  backdrop-filter: blur(6px);
+}
+.audio-ctrl button{
+  background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18);
+  color:var(--text); border-radius:999px; padding:6px 10px; cursor:pointer;
+}
+
+/* stepper */
+.progress{
+  position:fixed; top:10px; left:50%; transform:translateX(-50%);
+  display:flex; gap:10px; z-index:10;
+}
+.progress .dot{
+  width:8px;height:8px;border-radius:50%;
+  background:#3b405a; transition:all .2s;
+}
+.progress .dot.active{background:var(--pink)}
+.step{
+  min-height:100dvh;
+  display:none;
+  padding:64px 18px 96px; /* เดิม 28px → 96px เพื่อกันพื้นที่ปุ่มล่าง */
+  position:relative; z-index:1
+}
+
+.step.current{
+  display:flex;                 /* จาก block → flex */
+  flex-direction:column;
+  justify-content:center;       /* กึ่งกลางแนวดิ่ง */
+  align-items:center;           /* กึ่งกลางแนวนอน */
+  animation:fadeSlide .35s ease;
+}
+
+@keyframes fadeSlide{
+  from{opacity:0; transform:translateY(8px)}
+  to{opacity:1; transform:translateY(0)}
+}
+
+.hero{position:relative; text-align:center; overflow:hidden}
+/* ให้แสงครอบคลุมทั้งจอ และค่อย ๆ จางลง */
+.bg-glow{
+  position: fixed;           /* จาก absolute → fixed */
+  inset: -30% -20% -30% -20%;/* ครอบเลยทั้งบน-ล่าง-ซ้าย-ขวา */
+  height: auto;
+  background:
+   radial-gradient(600px 240px at 50% 30%, rgba(255,122,195,.25), transparent 60%),
+   radial-gradient(400px 180px at 20% 40%, rgba(158,230,255,.18), transparent 60%),
+   radial-gradient(500px 220px at 80% 20%, rgba(255,167,215,.18), transparent 60%);
+  filter: blur(80px);
+  pointer-events:none;
+  z-index: 1;                 /* อยู่ใต้คอนเทนต์ เหนือพื้นหลัง */
+  /* ทำให้ขอบล่างค่อย ๆ หาย (ช่วยกันแถบ) */
+  -webkit-mask-image: linear-gradient(to bottom, #000 65%, transparent 100%);
+          mask-image: linear-gradient(to bottom, #000 65%, transparent 100%);
+}
+
+/* จัดระดับชั้นให้ถูก */
+#fireworks{ z-index:0; }   /* พื้นสุด */
+.step{ z-index:2; }        /* เนื้อหาอยู่บนสุด */
+
+.title{font-size:clamp(28px,6vw,54px); margin:0 0 4px; font-weight:700}
+.title span{font-family:Sriracha, cursive}
+.subtitle{color:var(--muted); margin:0 0 18px}
+
+.countdown{display:flex; gap:10px; justify-content:center; margin:10px 0 18px}
+.countdown.big span{font-size:clamp(28px,8vw,64px)}
+.countdown div{background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08);
+  padding:10px 14px; border-radius:12px; min-width:70px}
+.countdown span{display:block; font-size:20px; font-weight:700}
+.countdown small{color:var(--muted); font-size:12px}
+
+.actions,.nav{display:flex; gap:10px; justify-content:center; flex-wrap:wrap}
+.btn{
+  border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.06);
+  color:var(--text); padding:10px 16px; border-radius:12px; cursor:pointer;
+  backdrop-filter: blur(6px); transition:transform .08s ease, background .2s;
+}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:linear-gradient(90deg,var(--pink),var(--pink-2)); border:none; color:#1b0c14}
+.btn.waiting {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+  transition: opacity .3s ease;
+}
+
+main{max-width:980px; margin:0 auto}
+
+.card{
+  background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.12); padding:22px; border-radius:16px; margin:18px auto;
+}
+.card h2{margin:8px 0 8px}
+.type{line-height:1.7; font-size:18px}
+.sign{margin-top:12px; color:var(--muted)}
+
+.gallery{margin:12px 0 24px}
+.gallery h2{margin:0 0 12px; text-transform:lowercase; letter-spacing:.5px; color:var(--accent)}
+.rail{
+  display:grid; grid-auto-flow:column; grid-auto-columns:80%;
+  gap:12px; overflow-x:auto; scroll-snap-type:x mandatory; padding-bottom:10px;
+}
+.ph{
+  background:#0d0f17; border:1px dashed rgba(255,255,255,.2); border-radius:16px;
+  height:320px; display:flex; align-items:center; justify-content:center;
+  color:var(--muted); font-size:14px; scroll-snap-align:center;
+}
+.ph img{width:100%; height:100%; object-fit:cover; border-radius:16px}
+.dots{display:flex; gap:8px; justify-content:center; margin-top:8px}
+.dots .dot{width:6px; height:6px; border-radius:50%; background:#374151; opacity:.7}
+.dots .dot.active{opacity:1; background:var(--pink)}
+
+.quotes{margin:10px 0 0; padding-left:18px}
+.quotes li{margin:8px 0; line-height:1.7}
+
+footer{
+  position:sticky; bottom:0; width:100%; text-align:center; padding:12px;
+  background:linear-gradient(180deg, transparent, rgba(0,0,0,.4));
+  color:var(--muted)
+}
+
+@media (min-width:740px){
+  .rail{grid-auto-columns:46%}
+}
+/* ขนาดกรอบ — ใช้ของเดิมได้ */
+.gallery-frame{
+  position:relative;
+  width: min(90vw, 650px);
+   height: min(60vh, 780px); /* จาก 70vh → 60vh (หรือจะ 65vh ตามชอบ) */
+  margin: 0 auto 20px;      /* เติม margin-bottom กันดู “ลอย” */
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden; border-radius:16px;
+}
+
+/* สแต็กภาพทับกัน แล้วเฟดเข้าออก */
+.gallery-frame .slide{ position:relative; width:100%; height:100%; }
+.gallery-frame img{
+  position:absolute; inset:0;
+  width:100%; height:100%; object-fit:cover;
+  border-radius:16px;
+  opacity:0; transition:opacity .45s ease;
+}
+.gallery-frame img.show{ opacity:1; }
+
+/* แอนิเมชันขณะแสดงภาพใหม่ (เฟด + ซูมเข้าเล็กน้อย) */
+.gallery-frame img.animate{
+  animation: fadeZoom .6s ease both;
+}
+@keyframes fadeZoom{
+  from{ opacity:0; transform: scale(1.02); }
+  to  { opacity:1; transform: scale(1); }
+}
+
+/* ปุ่มเลื่อน (ใช้สไตล์สวย ๆ ที่ทำไว้ได้เลย) */
+
+.caption-top{ max-width:min(90vw,650px); margin:6px auto 10px; padding:8px 12px;
+  text-align:center; color:var(--text); background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12); border-radius:12px; }
+.caption-top:empty{ display:none; }
+.caption-top.fade{ animation: capfade .25s ease both; }
+@keyframes capfade{ from{opacity:0;transform:translateY(-2px)} to{opacity:1;transform:none} }
+
+.gallery-frame img{ position:absolute; inset:0; width:100%; height:100%;
+  object-fit:cover; border-radius:16px; opacity:0; transition:opacity .45s ease; z-index:0 }
+.gallery-frame img.show{ opacity:1; z-index:1 }
+
+.arrow{
+  position:absolute; top:50%; transform:translateY(-50%);
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.2);
+  color:#fff; font-size:28px; padding:10px 14px;
+  border-radius:50%; cursor:pointer;
+  transition:all .25s ease; backdrop-filter: blur(4px);
+  box-shadow:0 0 12px rgba(255,122,195,0.3);
+  z-index: 5; /* <<< เพิ่มบรรทัดนี้ */
+}
+
+.arrow::before{
+  content:"";
+  display:block; width:100%; height:100%;
+  -webkit-mask: var(--chev) center/50% 50% no-repeat;
+          mask: var(--chev) center/50% 50% no-repeat;
+  background:#fff;
+}
+.arrow.left  { left:14px;  --chev:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23fff" d="M15.4 3.4 7.8 11l7.6 7.6-1.4 1.4L5 11l9-9z"/></svg>'); }
+.arrow.right { right:14px; --chev:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23fff" d="m8.6 20.6 7.6-7.6-7.6-7.6L10 4 19 13l-9 9z"/></svg>'); }
+
+/* ===== Page transition ===== */
+#stage { position: relative; overflow: hidden; }
+
+.step { will-change: transform, opacity; }
+.step.enter-from-right { animation: enterFromRight .38s ease both; }
+.step.enter-from-left  { animation: enterFromLeft  .38s ease both; }
+.step.leave-to-left    { animation: leaveToLeft   .32s ease both; }
+.step.leave-to-right   { animation: leaveToRight  .32s ease both; }
+
+@keyframes enterFromRight {
+  from { transform: translateX(6%); opacity: 0; }
+  to   { transform: translateX(0);  opacity: 1; }
+}
+@keyframes enterFromLeft {
+  from { transform: translateX(-6%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+@keyframes leaveToLeft {
+  from { transform: translateX(0);  opacity: 1; }
+  to   { transform: translateX(-6%); opacity: 0; }
+}
+@keyframes leaveToRight {
+  from { transform: translateX(0);  opacity: 1; }
+  to   { transform: translateX(6%); opacity: 0; }
+}
+
+/* ถ้าผู้ใช้เปิด reduce motion ก็ปิดแอนิเมชัน */
+@media (prefers-reduced-motion: reduce) {
+  .step.enter-from-right,
+  .step.enter-from-left,
+  .step.leave-to-left,
+  .step.leave-to-right { animation: none !important; }
+}
+.gallery-frame img {
+  position:absolute; inset:0;
+  width:100%; height:100%; object-fit:cover;
+  border-radius:16px;
+  opacity:0;
+  transition: opacity .45s ease;
+  z-index:0;
+}
+.gallery-frame img.show { opacity:1; z-index:1; }
+
+/* ===== Modal Style ===== */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(2px);
+  z-index: 50;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal__panel {
+  background: rgba(24,24,32,0.9);
+  border-radius: 16px;
+  padding: 24px 20px;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  animation: popIn 0.3s ease;
+}
+
+.modal__title {
+  font-size: 28px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+.modal__text {
+  color: #ccc;
+  margin-bottom: 16px;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+/* ===== Popup Animation ===== */
+.animate-popup {
+  animation: fadeInUp 0.55s ease both;
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-8px) scale(1.03);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+/* ==================== BEAUTY UPGRADE (append to bottom) ==================== */
+/* โทนสีหลัก */
+:root{
+  --bg:#0f1016; --card:#151826; --text:#eef2ff; --muted:#b8c0ff;
+  --pink:#ff7ac3; --pink-2:#ffa7d7; --accent:#9ee6ff;
+}
+
+/* พื้นหลังไล่สีแบบ animate เบา ๆ */
+body{
+  background:
+    radial-gradient(1200px 800px at 20% -200px, rgba(255,122,195,.12), transparent 60%),
+    radial-gradient(1100px 900px at 80% -150px, rgba(158,230,255,.12), transparent 60%),
+    radial-gradient(800px 800px at 50% 120%, rgba(255,167,215,.10), transparent 60%),
+    linear-gradient(180deg,#0f1016 0%,#0b0c13 100%);
+  animation:bgFloat 18s ease-in-out infinite alternate;
+}
+@keyframes bgFloat{
+  0%{ background-position: 0 0, 0 0, 0 0, 0 0 }
+  100%{ background-position: 10px -8px, -12px -6px, 6px 10px, 0 0 }
+}
+
+/* การ์ดแบบ glass + เงานุ่ม */
+.card{
+  backdrop-filter: blur(10px);
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:22px;
+  padding:28px;
+  box-shadow:
+    0 10px 30px rgba(0,0,0,.35),
+    inset 0 1px 0 rgba(255,255,255,.05);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.card:hover{ transform: translateY(-2px); box-shadow:0 16px 40px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.05) }
+.title{ letter-spacing:.3px }
+.subtitle{ color:var(--muted) }
+
+/* ปุ่มโค้งมน — โทนชมพู */
+.btn{
+  --ring: rgba(255,122,195,.35);
+  appearance:none; border:0; cursor:pointer;
+  padding:10px 16px; border-radius:14px;
+  background:#22263a; color:var(--text); font-weight:600;
+  transition: transform .08s ease, box-shadow .2s ease, background .2s ease, opacity .2s ease;
+  box-shadow: 0 6px 14px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06);
+}
+.btn:hover{ transform: translateY(-1px); box-shadow:0 10px 18px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.06) }
+.btn:active{ transform: translateY(0) scale(.98) }
+.btn:focus-visible{ outline:3px solid var(--ring); outline-offset:2px }
+
+.btn.primary{
+  background: linear-gradient(180deg, var(--pink) 0%, var(--pink-2) 100%);
+  color:#280c1b;
+  text-shadow:0 1px 0 rgba(255,255,255,.35);
+}
+.btn.primary:hover{ filter:brightness(1.05) }
+
+/* แถบนำทางของแต่ละหน้า */
+.nav{ display:flex; gap:10px; justify-content:center; margin-top:18px }
+.nav .btn{ min-width:110px }
+
+/* จุดบอกหน้า (dot indicator) */
+.dots{ display:flex; gap:8px; justify-content:center; margin:18px 0 8px }
+.dots .dot{
+  width:8px; height:8px; border-radius:999px; background:rgba(255,255,255,.28);
+  transition: all .25s ease;
+}
+.dots .dot.active{ width:22px; background:linear-gradient(90deg,var(--pink),var(--accent)) }
+
+/* เคาน์ดาวน์การ์ดด้านบน */
+.counter{ display:flex; gap:14px; justify-content:center; margin:40px 0 18px }
+.counter .box{
+  min-width:94px; text-align:center; padding:14px 12px;
+  border-radius:16px;
+  background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 6px 16px rgba(0,0,0,.4);
+}
+.counter .big{ font-size:36px; font-weight:800; line-height:1 }
+.counter .label{ font-size:12px; color:var(--muted); letter-spacing:.5px }
+
+/* แกลเลอรีสไลด์ */
+.rail{ position:relative }
+.slide{
+  border-radius:18px; overflow:hidden; border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 12px 30px rgba(0,0,0,.5);
+}
+.arrow{
+  position:absolute; top:50%; transform: translateY(-50%);
+  width:42px; height:42px; border-radius:999px; display:grid; place-items:center;
+  background:rgba(10,12,20,.6); border:1px solid rgba(255,255,255,.14);
+  backdrop-filter: blur(6px);
+}
+.arrow:hover{ background:rgba(10,12,20,.75) }
+.arrow.left{ left:10px } .arrow.right{ right:10px }
+
+/* modal Happy Birthday */
+.modal{
+  max-width:520px; margin:0 auto; padding:24px; border-radius:20px;
+  background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+  border:1px solid rgba(255,255,255,.16); box-shadow:0 18px 40px rgba(0,0,0,.55);
+}
+.modal h3{ margin:0 0 10px }
+.modal p{ color:var(--muted) }
+.modal .actions{ display:flex; gap:10px; justify-content:center; margin-top:16px }
+
+/* พิมพ์ข้อความแบบ typewriter ให้มี caret กะพริบ */
+.type{ position:relative }
+.type::after{
+  content:""; position:absolute; right:-2px; top:.2em; bottom:.2em; width:2px;
+  background: linear-gradient(180deg,var(--pink),var(--accent));
+  animation: caret 1s steps(1,end) infinite;
+}
+@keyframes caret{ 50%{ opacity:0 } }
+
+/* ท้ายหน้า */
+footer{
+  opacity:.85; color:var(--muted); font-size:13px; letter-spacing:.3px;
+  margin:40px 0 28px; text-align:center;
+}
+/* จำกัดขนาดรูปในสไลด์ให้พอดีกับหน้าจอ */
+.slide img {
+  max-width: 100%;
+  max-height: 65vh; /* ปรับให้ไม่กินเกิน 65% ของความสูงหน้าจอ */
+  object-fit: cover; /* ครอบเฟรมสวย ไม่บีบภาพ */
+  border-radius: 16px;
+  display: block;
+  margin: 0 auto;
+}
+/* ลบเส้นขอบรอบรูปในสไลด์ */
+.slide{
+  border: none !important;      /* เดิมมี 1px */
+  overflow: hidden;             /* กันภาพล้นมุมโค้ง */
+  background: transparent;      /* กันดูเป็นขอบฟุ้ง ๆ */
+  border-radius: 18px;          /* มุมมนเหมือนเดิม */
+  box-shadow: 0 12px 30px rgba(0,0,0,.5); /* เงานุ่มแทนเส้นขอบ */
+}
+
+/* กันรูปมีขอบ/เส้นบางจาก browser */
+.slide img{
+  border: none !important;
+  outline: none;
+  display: block;
+  border-radius: 18px;          /* ให้โค้งตามกรอบ */
+}
+/* ---- FIX: จัดปุ่มลูกศรให้อยู่กลางภาพจริง ๆ ---- */
+
+/* ให้ .slide เป็นกรอบอ้างอิงตำแหน่ง */
+.slide {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ล็อกตำแหน่งปุ่มกับความสูงของรูป */
+.slide img {
+  display: block;
+  max-height: 65vh;
+  width: auto;
+  height: auto;
+  border-radius: 20px;
+}
+
+/* ปุ่มลูกศรซ้าย-ขวา */
+.arrow {
+  position: absolute;
+  top: 50%;                        /* วางกึ่งกลาง */
+  transform: translateY(-50%);     /* ชดเชยครึ่งหนึ่ง */
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: background 0.2s;
+}
+
+.arrow:hover { background: rgba(0,0,0,0.75); }
+
+.arrow.left  { left: 12px; }
+.arrow.right { right: 12px; }
+
+/* ปิดเคอร์เซอร์ขีดแนวตั้งของข้อความพิมพ์ */
+.type::after { content: none !important; display: none !important; }
