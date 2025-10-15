@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Birthday Card 🩷</title>
+  <meta name="description" content="การ์ดอวยพรวันเกิดแบบหลายหน้า">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&family=Sriracha&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styleold.css" />
+</head>
+<body>
+  <!-- พลุ -->
+  <canvas id="fireworks"></canvas>
+
+  <!-- คอนโทรลเพลง (ทุกหน้า) -->
+  <div class="audio-ctrl">
+    <button id="volDown" aria-label="ลดเสียง">−</button>
+    <button id="togglePlay" aria-label="เล่น/หยุด">▶</button>
+    <button id="volUp" aria-label="เพิ่มเสียง">＋</button>
+  </div>
+
+  <!-- จุดสถานะหน้า -->
+  <div class="progress">
+    <div class="dot active"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+  </div>
+
+  <!-- STEP 1: Countdown only -->
+  <section class="step current" data-step="0">
+    <header class="hero">
+      <div class="bg-glow"></div>
+
+      <div class="countdown big">
+        <div><span id="dd">00</span><small>Days</small></div>
+        <div><span id="hh">00</span><small>Hours</small></div>
+        <div><span id="mm">00</span><small>Mins</small></div>
+        <div><span id="ss">00</span><small>Secs</small></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="btnPlayAlso">♫ เปิดเพลง</button>
+        <button data-next class="btn primary">เริ่มการ์ด</button>
+      </div>
+
+      <audio id="bgm" loop>
+        <!-- ใส่ไฟล์เพลงของนายเอง -->
+        <source src="hbd.mp3" type="audio/mpeg">
+      </audio>
+    </header>
+  </section>
+
+  <!-- STEP 2: Pop-up -->
+<section class="step" data-step="1">
+  <main>
+    <!-- ป๊อปอัป -->
+    <div id="hbModal" class="modal hidden" aria-hidden="true">
+      <div class="modal__panel animate-popup">
+        <h2 class="modal__title">🎉 Happy Birthday! 🎂</h2>
+        <p class="modal__text">
+          ขอให้วันนี้มีรอยยิ้มและเรื่องดี ๆ นะครับ ✨ <br> 
+          มีความสุขมาก ๆ ในทุก ๆ วันเลย 💖
+        </p>
+
+        <!-- ใช้ปุ่มย้อนกลับ/ถัดไปชุดเดียวกับปกติ -->
+        <div class="modal__actions nav">
+          <button id="hbPrev" class="btn">ย้อนกลับ</button>
+          <button id="hbOk" class="btn primary">ถัดไป</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</section>
+
+<!-- STEP 3: แกลเลอรี -->
+<section class="step" data-step="2">
+
+  <main>
+    <section class="gallery">
+      <h2>our little moments</h2>
+
+      <!-- แคปชันเหนือรูป -->
+      <div id="captionTop" class="caption-top"></div>
+
+      <div class="gallery-frame">
+        <button class="arrow left" id="prevImg">❮</button>
+        <div class="slide" id="gallerySlides">
+          <img src="IMG_1.jpg" data-caption="หาความสุขให้ตัวเองด้วยนะเรา" class="show">
+          <img src="IMG_2.jpg" data-caption="กินให้มันเยอะๆหน่อยสิอย่ากินเท่าแมวดม">
+          <img src="IMG_3.jpg" data-caption="ยิ้มเยอะๆนะคนเก่งของน้อง">
+            <img src="IMG_4.jpg" data-caption="พี่เป็นคนเก่งน้าไม่ต้องคิดมาก">
+            <img src="IMG_5.jpg" data-caption="พี่สาวเป็นคนที่น่ารักมากๆเลย">
+            <img src="IMG_6.jpg" data-caption="ดูแลตัวเองดีดีกด้วยดิเรา">
+            <img src="IMG_7.jpg" data-caption="เวลาพี่ยิ้มพี่น่ารักที่สุดเลยนะ">
+            <img src="IMG_8.jpg" data-caption="น้องหนะชอบพี่มากๆเลยรู้ป่าว">
+        </div>
+        <button class="arrow right" id="nextImg">❯</button>
+      </div>
+
+      <div class="dots" id="dots"></div>
+    </section>
+
+    <div class="nav">
+      <button data-prev class="btn">ย้อนกลับ</button>
+      <button data-next class="btn primary">ถัดไป</button>
+    </div>
+  </main>
+</section>
+
+
+
+  <!-- STEP 4: HBD + ข้อความ -->
+<section class="step" data-step="3">
+  <main class="card">
+    <h1 class="title">Happy Birthday, <span id="herName">พี่ฝ้าย</span> 🎂</h1>
+    <p class="subtitle">ขอให้วันนี้และทุกวันเป็นวันของความสุขของคุณพี่นะคับ</p>
+
+    <h2>ข้อความจากใจ</h2>
+    <p id="typewriter" class="type"></p>
+    <div class="sign">— จาก <span id="fromName">น้องชิที่รักคุณฝ้ายสุดหัวใจ</span> 🐰</div>
+
+    <!-- ปุ่มของหน้า 4 เท่านั้น -->
+    <div class="nav">
+      <button data-prev class="btn">ย้อนกลับ</button>
+      <button id="btnClose" class="btn primary">ปิดการ์ด</button>
+    </div>
+  </main>
+</section>
+
+  <footer>ทำด้วยใจแด่ <span id="herName2">คุณฝ้าย</span></footer>
+
+  <script src="scriptold.js"></script>
+</body>
+</html>
