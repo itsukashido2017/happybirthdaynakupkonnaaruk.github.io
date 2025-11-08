@@ -367,4 +367,3 @@ dotEls.forEach((d,i)=> d.addEventListener("click", ()=> showSlide(i)));
 
 
 
-
